@@ -6,7 +6,7 @@ fetch('https://localhost:5001/connect/token', {
     grant_type: 1
   }),
   headers: {
-    'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    'Content-type': 'application/json; charset=UTF-8'
   }
 })
 .then(res => res.json())
