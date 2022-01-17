@@ -12,3 +12,10 @@ C:\Program Files (x86)\AWS Tools\Deployment Tool>awsdeploy -r C:\publish\files\C
 
 
 https://github.com/Vanlightly/Taskling.NET
+
+```c#
+var conditions = groups.Aggregate(new List<ConditionGroup>(), (conditions, group) =>
+                {
+                    conditions.AddRange(JsonConvert.DeserializeObject<List<ConditionGroup>>(group.Conditions));
+                    return conditions;
+                }); 
