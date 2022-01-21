@@ -1,0 +1,163 @@
+
+
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <meta name="description" content="">
+            <meta name="author" content="Microsoft">
+            <title>Loading...</title>
+            <style>
+                .circle-131 {
+                    box-sizing: border-box;
+                    animation-name: css-114;
+                    animation-duration: 1.3s;
+                    animation-iteration-count: infinite;
+                    animation-timing-function: cubic-bezier(0.53, 0.21, 0.29, 0.67);
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border-width: 1.5px;
+                    border-style: solid;
+                    border-color: rgb(0, 120, 212) rgb(199, 224, 244) rgb(199, 224, 244);
+                    border-image: initial;
+                }
+
+                @keyframes css-114{
+                    0% {
+                        transform: rotate(0deg);
+                    }
+
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                @-webkit-keyframes css-114{
+                    0% {
+                        transform: rotate(0deg);
+                    }
+
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                #ms-Spinner {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    -webkit-transform: translate(-50%, -50%);
+                    transform: translate(-50%, -50%);
+                }
+            </style>
+            <script src="https://statics.teams.cdn.office.net/sdk/v1.9.0/js/MicrosoftTeams.min.js" integrity="sha384-bcRxWKfzRyPxg/waVm3IsOnaH2Inoh5gGIJNOat79+wq22/BZ+mFuSTUmVc7l2el" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+            <script type="text/javascript">
+                // Storage feature detection based on - https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage
+                function isStorageAvailable(storageType) {
+                    var storage;
+                    try {
+                        storage = window[storageType];
+                        var key = 'TeamsStorageTest';
+                        storage.setItem(key, key);
+                        storage.removeItem(key);
+                        return true;
+                    }
+                    catch (e) {
+                        console.warn(storageType + ' is not available');
+                        return false;
+                    }
+                }
+
+                try{
+                    var localStorageAvailable = isStorageAvailable('localStorage');
+                    var sessionStorageAvailable = isStorageAvailable('sessionStorage');
+                    if (sessionStorageAvailable) {
+                        sessionStorage.setItem('TeamsLogonSuccess', 0);
+                        sessionStorage.setItem('TeamsLogonStart', Date.now());
+                    }
+                    var destQueryParam = 'dest=';
+                    var destUrl;
+
+                    if (window.location.search.indexOf('vivaconnections=true') != -1) {
+                        destUrl = "{vivaConnections_landingURL}";
+
+                        // Update session storage for Viva App to measure perf
+                        if (sessionStorageAvailable) {
+                            sessionStorage.setItem('TeamsAppType', 'VivaConnections');
+                        }
+                    }
+                    else {
+                        destUrl = decodeURIComponent(window.location.href.substring(window.location.href.indexOf(destQueryParam) + destQueryParam.length));
+                    }
+
+                    if (destUrl) {
+                        var urlParser = document.createElement('a');
+
+                        microsoftTeams.initialize();
+                        microsoftTeams.getContext(function(context) {
+                            if (sessionStorageAvailable && window.location.search.indexOf('app=portals')) {
+                                var lastUrl = sessionStorage.getItem('TeamsHomeSiteLastUrl_' + context.entityId);
+                                sessionStorage.removeItem('TeamsHomeSiteLastUrl_' + context.entityId);
+                                destUrl = lastUrl ? lastUrl : destUrl;
+                            }
+                            urlParser.href = destUrl;
+
+                            var destUrlHost;
+                            if(urlParser.protocol){
+                                destUrlHost = urlParser.protocol + '//' + urlParser.hostname;
+                            } else {
+                                destUrlHost = window.location.protocol + '//' + window.location.hostname;
+                            }
+                            var webUrl = "https:\u002f\u002fdev500.sharepoint.com";
+                            var claim = "";
+                            if (!webUrl) {
+                                webUrl = destUrlHost;
+                            }
+                            var authTokenRequest = {
+                                successCallback: function(token) {
+                                    var headers = new Headers();
+                                    headers.append('Authorization', 'Bearer ' + token);
+                                    var request = new Request(webUrl + '/_api/SP.OAuth.NativeClient/Authenticate', { headers: headers, method: 'POST', credentials: 'same-origin' });
+                                    fetch(request).then(function() {
+                                        if (sessionStorageAvailable) {
+                                            sessionStorage.setItem('TeamsLogonSuccess', Date.now());
+                                        }
+                                        window.location.replace(destUrl);
+                                    }).catch(function(err) {
+                                        if (localStorageAvailable) {
+                                            localStorage.setItem('TeamsLogonFailure', err.toString() + ' Date:' + Date.now());
+                                        }
+                                        console.error(err);
+                                    });
+                                },
+                                failureCallback: function(err) {
+                                    if (localStorageAvailable) {
+                                        localStorage.setItem('TeamsLogonFailure', err.toString() + ' Date:' + Date.now());
+                                    }
+                                    console.error(err);
+                                },
+                                resources: [destUrlHost],
+                                claims: claim ? [claim] : undefined
+                            };
+                            microsoftTeams.authentication.getAuthToken(authTokenRequest);
+                        });
+                    }
+                } catch (err) {
+                    if (localStorageAvailable) {
+                        localStorage.setItem('TeamsLogonFailure', err.toString() + ' Date:' + Date.now());
+                    }
+                    console.error(err);
+                }
+            </script>
+          </head>
+          <body>
+              <div id="ms-Spinner" class="ms-Spinner root-126">
+                <div class="ms-Spinner-circle ms-Spinner--large circle-131 x-hidden-focus"></div>
+              </div>
+          </body>
+        </html>
+        
