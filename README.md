@@ -19,3 +19,13 @@ var conditions = groups.Aggregate(new List<ConditionGroup>(), (conditions, group
                     conditions.AddRange(JsonConvert.DeserializeObject<List<ConditionGroup>>(group.Conditions));
                     return conditions;
                 }); 
+
+
+   
+   
+### Request the permissions from a directory admin
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#request-the-permissions-from-a-directory-admin                
+                
+                
+https://login.microsoftonline.com/common/adminconsent?client_id={client-id}
