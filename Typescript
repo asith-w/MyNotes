@@ -1,1 +1,23 @@
 https://medium.com/@martin_hotell/10-typescript-pro-tips-patterns-with-or-without-react-5799488d6680
+
+
+const styleElements = document.getElementsByTagName('style');
+                // Loop through each style element
+                for (let i = 0; i < styleElements.length; i++) {
+                    const styleElement = styleElements[i];
+                    const cssText = styleElement.textContent;
+                  
+
+                    if (styleElement.getAttribute('type') == null) {
+                        console.log('@2@@2', i);
+
+                        // Check if the style element contains CSS rules for mindElixirToolbar
+                        if (cssText.includes('toolbar span:active {')) {
+                            // Remove the style element from the document
+                            styleElement.remove();
+                            return i;  
+                        }
+                    }
+
+                }
+    };
