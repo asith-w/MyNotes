@@ -3,4 +3,7 @@ singleValueExtendedProperties
 https://graph.microsoft.com/v1.0/me/events/AQMkADU2OWFjYTFjLWNkMGYtNDdlNS1hNDIxLWIxYjlmYWNhYmE5YQBGAAADqyJu-WyzJk6m5v0MbSs7lwcASdXmMkSN8kCNtzTsQ4x1lwAAAgENAAAASdXmMkSN8kCNtzTsQ4x1lwADffqbCQAAAA==?$expand=singleValueExtendedProperties($filter=id eq 'String {00020329-0000-0000-C000-000000000046} Name xxxxx')
   
 ##delegated permissions"  
-scopes that are granted by a user
+scopes that are granted by a user   
+
+
+https://graph.microsoft.com/v1.0/me/planner/tasks?$filter=priority eq 5 &$select=priority
